@@ -4,8 +4,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.atlasapi.media.entity.Channel;
-import org.atlasapi.persistence.channels.ChannelResolver;
+import org.atlasapi.media.channel.Channel;
+import org.atlasapi.media.channel.ChannelResolver;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;

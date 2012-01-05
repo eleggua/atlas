@@ -5,7 +5,7 @@ import static org.atlasapi.persistence.logging.AdapterLogEntry.errorEntry;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.atlasapi.media.entity.Channel;
+import org.atlasapi.media.channel.Channel;
 import org.atlasapi.media.entity.Publisher;
 import org.atlasapi.media.entity.ScheduleEntry.ItemRefAndBroadcast;
 import org.atlasapi.persistence.content.schedule.mongo.ScheduleWriter;

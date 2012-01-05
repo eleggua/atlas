@@ -3,9 +3,10 @@ package org.atlasapi.query;
 import org.atlasapi.application.query.ApplicationConfigurationFetcher;
 import org.atlasapi.beans.AtlasModelWriter;
 import org.atlasapi.feeds.www.DispatchingAtlasModelWriter;
+import org.atlasapi.media.channel.ChannelGroupStore;
+import org.atlasapi.media.channel.ChannelResolver;
 import org.atlasapi.media.entity.Broadcast;
 import org.atlasapi.media.entity.Item;
-import org.atlasapi.persistence.channels.ChannelResolver;
 import org.atlasapi.persistence.content.ContentResolver;
 import org.atlasapi.persistence.content.ContentWriter;
 import org.atlasapi.persistence.content.PeopleResolver;
@@ -13,10 +14,11 @@ import org.atlasapi.persistence.content.ScheduleResolver;
 import org.atlasapi.persistence.content.SearchResolver;
 import org.atlasapi.persistence.content.query.KnownTypeQueryExecutor;
 import org.atlasapi.persistence.logging.AdapterLog;
-import org.atlasapi.query.content.schedule.BroadcastRemovingScheduleOverlapListener;
 import org.atlasapi.query.content.schedule.ScheduleOverlapListener;
 import org.atlasapi.query.content.schedule.ScheduleOverlapResolver;
-import org.atlasapi.query.content.schedule.ThreadedScheduleOverlapListener;
+import org.atlasapi.query.v2.ChannelController;
+import org.atlasapi.query.v2.ChannelGroupController;
+import org.atlasapi.query.v2.ChannelSimplifier;
 import org.atlasapi.query.v2.PeopleController;
 import org.atlasapi.query.v2.QueryController;
 import org.atlasapi.query.v2.ScheduleController;
@@ -25,12 +27,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.metabroadcast.common.ids.NumberToShortStringCodec;
+import com.metabroadcast.common.ids.SubstitutionTableNumberCodec;
+
 @Configuration
 public class QueryWebModule {
     
     private @Autowired ContentWriter contentWriter;
     private @Autowired ContentResolver contentResolver;
     private @Autowired ChannelResolver channelResolver;
+    private @Autowired ChannelGroupStore channelGroupResolver;
     private @Autowired ScheduleResolver scheduleResolver;
     private @Autowired SearchResolver searchResolver;
     private @Autowired PeopleResolver peopleResolver;
@@ -40,6 +46,16 @@ public class QueryWebModule {
     private ApplicationConfigurationFetcher configFetcher;
     @Autowired
     private AdapterLog log;
+    
+    @Bean ChannelController channelController() {
+        NumberToShortStringCodec idCodec = new SubstitutionTableNumberCodec();
+        return new ChannelController(channelResolver, idCodec , new ChannelSimplifier(idCodec, channelResolver, channelGroupResolver));
+    }
+    
+    @Bean ChannelGroupController channelGroupController() {
+        NumberToShortStringCodec idCodec = new SubstitutionTableNumberCodec();
+        return new ChannelGroupController(channelGroupResolver, idCodec , new ChannelSimplifier(idCodec, channelResolver, channelGroupResolver));
+    }
     
     @Bean QueryController queryController() {
         return new QueryController(queryExecutor, configFetcher, log, atlasModelOutputter());

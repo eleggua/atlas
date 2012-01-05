@@ -2,7 +2,7 @@ package org.atlasapi.remotesite.pa;
 
 import java.io.File;
 
-import org.atlasapi.persistence.channels.ChannelResolver;
+import org.atlasapi.media.channel.ChannelResolver;
 import org.atlasapi.persistence.logging.AdapterLog;
 import org.atlasapi.remotesite.pa.data.PaProgrammeDataStore;
 import org.joda.time.DateTime;

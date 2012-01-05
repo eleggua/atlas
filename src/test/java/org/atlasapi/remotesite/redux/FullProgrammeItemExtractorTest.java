@@ -1,14 +1,14 @@
 package org.atlasapi.remotesite.redux;
 
+import org.atlasapi.media.channel.Channel;
+import org.atlasapi.media.channel.ChannelResolver;
 import org.atlasapi.media.entity.Broadcast;
-import org.atlasapi.media.entity.Channel;
 import org.atlasapi.media.entity.Encoding;
 import org.atlasapi.media.entity.Item;
 import org.atlasapi.media.entity.Location;
 import org.atlasapi.media.entity.MediaType;
 import org.atlasapi.media.entity.Publisher;
 import org.atlasapi.media.entity.Version;
-import org.atlasapi.persistence.channels.ChannelResolver;
 import org.atlasapi.persistence.channels.DummyChannelResolver;
 import org.atlasapi.persistence.logging.NullAdapterLog;
 import org.atlasapi.remotesite.redux.model.FullReduxProgramme;

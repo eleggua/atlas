@@ -30,8 +30,8 @@ import javax.xml.bind.Unmarshaller.Listener;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.atlasapi.media.entity.Channel;
-import org.atlasapi.persistence.channels.ChannelResolver;
+import org.atlasapi.media.channel.Channel;
+import org.atlasapi.media.channel.ChannelResolver;
 import org.atlasapi.persistence.logging.AdapterLog;
 import org.atlasapi.remotesite.pa.bindings.ChannelData;
 import org.atlasapi.remotesite.pa.bindings.ProgData;

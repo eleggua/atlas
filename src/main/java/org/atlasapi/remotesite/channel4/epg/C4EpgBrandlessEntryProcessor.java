@@ -4,9 +4,9 @@ import static org.atlasapi.media.entity.Publisher.C4;
 
 import java.util.Set;
 
+import org.atlasapi.media.channel.Channel;
 import org.atlasapi.media.entity.Brand;
 import org.atlasapi.media.entity.Broadcast;
-import org.atlasapi.media.entity.Channel;
 import org.atlasapi.media.entity.ChildRef;
 import org.atlasapi.media.entity.Episode;
 import org.atlasapi.media.entity.Identified;

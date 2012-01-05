@@ -9,7 +9,7 @@ import javax.annotation.PostConstruct;
 import nu.xom.Builder;
 import nu.xom.Document;
 
-import org.atlasapi.persistence.channels.ChannelResolver;
+import org.atlasapi.media.channel.ChannelResolver;
 import org.atlasapi.persistence.content.ContentResolver;
 import org.atlasapi.persistence.content.ContentWriter;
 import org.atlasapi.persistence.content.ScheduleResolver;
