@@ -172,13 +172,13 @@
                         <goals>
                             <goal>exec</goal>
                         </goals>
-                        <configuration>
-                            <executable>rm</executable>
-                            <arguments>
-                                <argument>-rf</argument>
-                                <arguement>src/main/webapp/static/js/generated/*</arguement>
-                            </arguments>
-                        </configuration>
+						<configuration>
+							<executable>${delete.command}</executable>
+							<arguments>
+								<argument>${delete.flags}</argument>
+								<arguement>src/main/webapp/static/js/generated/*</arguement>
+							</arguments>
+						</configuration>
                     </execution>
                     <execution>
                         <id>compile-templates</id>
@@ -305,6 +305,32 @@
             </plugins>
         </pluginManagement>
     </build>
+	<profiles>
+		<profile>
+			<id>non-windows</id>
+			<activation>
+				<os>
+					<family>!windows</family>
+				</os>
+			</activation>
+			<properties>
+				<delete.command>rm</delete.command>
+				<delete.flags>-rf</delete.flags>
+			</properties>
+		</profile>
+		<profile>
+			<id>Windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<delete.command>del</delete.command>
+				<delete.flags>/F /S</delete.flags>
+			</properties>
+		</profile>
+	</profiles>
     <dependencies>
         <dependency>
             <groupId>org.atlasapi</groupId>
@@ -528,4 +554,3 @@
         </repository>
     </repositories>
 </project>
-
