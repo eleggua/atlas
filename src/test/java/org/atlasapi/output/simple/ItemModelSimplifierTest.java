@@ -106,7 +106,12 @@ public class ItemModelSimplifierTest {
         Set<org.atlasapi.media.entity.simple.Location> simpleLocations = simpleItem.getLocations();
         assertThat(simpleLocations.size(), is(2));
         org.atlasapi.media.entity.simple.Location simpleLocation = Iterables.getFirst(simpleLocations, null);
+        org.atlasapi.media.entity.simple.Location simpleEmbed = null;
         
+        if( simpleLocation.getUri() == null ) {
+        	simpleEmbed = simpleLocation;
+        	simpleLocation = Iterables.getLast(simpleLocations, null);
+        }
         assertThat(simpleLocation.getUri(), is("http://example.com"));
         assertThat(simpleLocation.getDataContainerFormat(), is(MimeType.VIDEO_3GPP.toString()));
         assertThat(simpleLocation.getRestriction().getMessage(), is("adults only"));
@@ -116,7 +121,7 @@ public class ItemModelSimplifierTest {
         assertThat(simpleLocation.getAvailableCountries().size(), is(1));
         assertThat(simpleLocation.getAvailableCountries().iterator().next(), is("GB"));
         
-        org.atlasapi.media.entity.simple.Location simpleEmbed = Iterables.getLast(simpleLocations, null);
+        if( simpleEmbed == null ) simpleEmbed = Iterables.getLast(simpleLocations, null);
         assertThat(simpleEmbed.getEmbedId(), is("embedId"));
         assertThat(simpleEmbed.getTransportType(), is("embed"));
         assertThat(simpleEmbed.getTransportSubType(), is("brightcove"));
