@@ -33,7 +33,6 @@ import static org.atlasapi.media.entity.Publisher.SOUNDCLOUD;
 import static org.atlasapi.media.entity.Publisher.SPOTIFY;
 import static org.atlasapi.media.entity.Publisher.YOUTUBE;
 import static org.atlasapi.media.entity.Publisher.YOUVIEW;
-import static org.atlasapi.persistence.lookup.TransitiveLookupWriter.generatedTransitiveLookupWriter;
 
 import java.io.File;
 import java.util.Set;
@@ -54,8 +53,8 @@ import org.atlasapi.equiv.handlers.EquivalenceResultHandler;
 import org.atlasapi.equiv.handlers.EquivalenceSummaryWritingHandler;
 import org.atlasapi.equiv.handlers.LookupWritingEquivalenceHandler;
 import org.atlasapi.equiv.handlers.ResultWritingEquivalenceHandler;
-import org.atlasapi.equiv.results.combining.RequiredScoreFilteringCombiner;
 import org.atlasapi.equiv.results.combining.NullScoreAwareAveragingCombiner;
+import org.atlasapi.equiv.results.combining.RequiredScoreFilteringCombiner;
 import org.atlasapi.equiv.results.extractors.MusicEquivalenceExtractor;
 import org.atlasapi.equiv.results.extractors.PercentThresholdEquivalenceExtractor;
 import org.atlasapi.equiv.results.filters.AlwaysTrueFilter;
@@ -86,7 +85,7 @@ import org.atlasapi.media.entity.Song;
 import org.atlasapi.persistence.content.ContentResolver;
 import org.atlasapi.persistence.content.ScheduleResolver;
 import org.atlasapi.persistence.content.SearchResolver;
-import org.atlasapi.persistence.lookup.entry.LookupEntryStore;
+import org.atlasapi.persistence.lookup.LookupWriter;
 import org.joda.time.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -108,7 +107,7 @@ public class EquivModule {
     private @Autowired ContentResolver contentResolver;
     private @Autowired ChannelResolver channelResolver;
     private @Autowired EquivalenceSummaryStore equivSummaryStore;
-    private @Autowired LookupEntryStore lookupStore;
+    private @Autowired LookupWriter lookupWriter;
 
     public @Bean RecentEquivalenceResultStore equivalenceResultStore() {
         return new RecentEquivalenceResultStore(new FileEquivalenceResultStore(new File(equivResultsDirectory)));
@@ -116,8 +115,8 @@ public class EquivModule {
 
     private EquivalenceResultHandler<Container> containerResultHandlers(Iterable<Publisher> publishers) {
         return new BroadcastingEquivalenceResultHandler<Container>(ImmutableList.of(
-            new LookupWritingEquivalenceHandler<Container>(generatedTransitiveLookupWriter(lookupStore), publishers),
-            new EpisodeMatchingEquivalenceHandler(contentResolver, equivSummaryStore, generatedTransitiveLookupWriter(lookupStore), publishers),
+            new LookupWritingEquivalenceHandler<Container>(lookupWriter, publishers),
+            new EpisodeMatchingEquivalenceHandler(contentResolver, equivSummaryStore, lookupWriter, publishers),
             new ResultWritingEquivalenceHandler<Container>(equivalenceResultStore()),
             new EquivalenceSummaryWritingHandler<Container>(equivSummaryStore)
         ));
@@ -146,7 +145,7 @@ public class EquivModule {
             .withExtractor(PercentThresholdEquivalenceExtractor.<Item> moreThanPercent(90))
             .withHandler(new BroadcastingEquivalenceResultHandler<Item>(ImmutableList.of(
                 EpisodeFilteringEquivalenceResultHandler.relaxed(
-                    new LookupWritingEquivalenceHandler<Item>(generatedTransitiveLookupWriter(lookupStore), acceptablePublishers),
+                    new LookupWritingEquivalenceHandler<Item>(lookupWriter, acceptablePublishers),
                     equivSummaryStore
                 ),
                 new ResultWritingEquivalenceHandler<Item>(equivalenceResultStore()),
@@ -233,7 +232,7 @@ public class EquivModule {
             .withExtractor(new MusicEquivalenceExtractor())
             .withHandler((EquivalenceResultHandler<Item>) new BroadcastingEquivalenceResultHandler<Item>(ImmutableList.of(
                 EpisodeFilteringEquivalenceResultHandler.relaxed(
-                    new LookupWritingEquivalenceHandler<Item>(generatedTransitiveLookupWriter(lookupStore), itunesAndMusicPublishers),
+                    new LookupWritingEquivalenceHandler<Item>(lookupWriter, itunesAndMusicPublishers),
                     equivSummaryStore
                 ),
                 new ResultWritingEquivalenceHandler<Item>(equivalenceResultStore()),
@@ -301,8 +300,7 @@ public class EquivModule {
             .withExtractor(PercentThresholdEquivalenceExtractor.<Item> moreThanPercent(90))
             .withHandler(new BroadcastingEquivalenceResultHandler<Item>(ImmutableList.of(
                 EpisodeFilteringEquivalenceResultHandler.strict(
-                    new LookupWritingEquivalenceHandler<Item>(
-                        generatedTransitiveLookupWriter(lookupStore), acceptablePublishers),
+                    new LookupWritingEquivalenceHandler<Item>(lookupWriter, acceptablePublishers),
                     equivSummaryStore
                 ),
                 new ResultWritingEquivalenceHandler<Item>(equivalenceResultStore()),
@@ -343,8 +341,7 @@ public class EquivModule {
             .withExtractor(PercentThresholdEquivalenceExtractor.<Item> moreThanPercent(90))
             .withHandler(new BroadcastingEquivalenceResultHandler<Item>(ImmutableList.of(
                 EpisodeFilteringEquivalenceResultHandler.relaxed(
-                    new LookupWritingEquivalenceHandler<Item>(
-                        generatedTransitiveLookupWriter(lookupStore), 
+                    new LookupWritingEquivalenceHandler<Item>(lookupWriter, 
                         ImmutableSet.of(RADIO_TIMES, PA, PREVIEW_NETWORKS)),
                         equivSummaryStore
                 ),
