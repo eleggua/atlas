@@ -21,11 +21,7 @@ public class ItvWhatsOnUpdater {
     }
     
     private String getFeedForDate(LocalDate date) {
-        String url = feedUrl
-                .replace(":yyyy", String.valueOf(date.getYear()))
-                .replace(":mm", String.format("%02d", date.getMonthOfYear()))
-                .replace(":dd", String.format("%02d", date.getDayOfMonth()));
-        return url;
+        return feedUrl + date.toString("YYYY/MM/dd");
     }
     
     private List<ItvWhatsOnEntry> getFeed(String uri) {
