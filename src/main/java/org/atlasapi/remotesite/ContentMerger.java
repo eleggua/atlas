@@ -1,18 +1,26 @@
 package org.atlasapi.remotesite;
 
+import java.util.Map;
+
 import org.atlasapi.media.entity.Container;
 import org.atlasapi.media.entity.Content;
 import org.atlasapi.media.entity.Episode;
 import org.atlasapi.media.entity.Identified;
 import org.atlasapi.media.entity.Item;
 import org.atlasapi.media.entity.Series;
+import org.atlasapi.media.entity.Version;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class ContentMerger {
     
     public static Item merge(Item current, Item extracted) {
+
+        current = mergeVersions(current, extracted);
         current = mergeContents(current, extracted);
+        
         current.setParentRef(extracted.getContainer());
-        current.setVersions(extracted.getVersions());
         if (current instanceof Episode && extracted instanceof Episode) {
             Episode currentEp = (Episode) current;
             Episode extractedEp = (Episode) extracted;
@@ -47,7 +55,26 @@ public class ContentMerger {
         current.setSpecialization(extracted.getSpecialization());
         current.setLastUpdated(extracted.getLastUpdated());
         return current;
-    }   
+    }
+
+    public static Item mergeVersions(Item current, Item extracted) {
+        // need to merge broadcasts on versions with same uri
+        Map<String, Version> mergedVersions = Maps.newHashMap();
+        for (Version version : current.getVersions()) {
+            mergedVersions.put(version.getCanonicalUri(), version);
+        }
+        for (Version version : extracted.getVersions()) {
+            if (mergedVersions.containsKey(version.getCanonicalUri())) {
+                Version mergedVersion = mergedVersions.get(version.getCanonicalUri());
+                mergedVersion.setBroadcasts(Sets.union(version.getBroadcasts(), mergedVersion.getBroadcasts()));
+                mergedVersions.put(version.getCanonicalUri(), mergedVersion);
+            } else {
+                mergedVersions.put(version.getCanonicalUri(), version);
+            }
+        }
+        current.setVersions(Sets.newHashSet(mergedVersions.values()));
+        return current;
+    }
     
     public static Container asContainer(Identified identified) {
         return castTo(identified, Container.class);

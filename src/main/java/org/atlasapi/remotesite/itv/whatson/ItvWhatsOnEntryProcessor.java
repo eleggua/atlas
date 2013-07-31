@@ -13,7 +13,6 @@ import org.atlasapi.remotesite.ContentMerger;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
 
 
 public class ItvWhatsOnEntryProcessor {
@@ -37,16 +36,17 @@ public class ItvWhatsOnEntryProcessor {
             }
         } else {
             Content resolvedContent = (Content)resolved.get(content.getCanonicalUri()).requireValue();
-            if (content instanceof Item && resolvedContent instanceof Episode) {
+            if (content instanceof Item) {
                 Item resolvedItem = (Item)resolvedContent;
                 Item contentItem = (Item)content;
-                contentItem.setParentRef(resolvedItem.getContainer());                
-                contentWriter.createOrUpdate(ContentMerger.merge(resolvedItem, (Item)resolvedContent));
-            } else if (content instanceof Item) {
-                ContentMerger.merge((Item)resolvedContent, (Item) content);
-                contentWriter.createOrUpdate((Item)resolvedContent);
-            }
-            else {
+                
+                // The API sometimes fails to return a container for an episode.
+                // If that happens we don't want to remove an existing reference.
+                if (resolvedItem.getContainer() != null) {
+                    contentItem.setParentRef(resolvedItem.getContainer());
+                }
+                contentWriter.createOrUpdate(ContentMerger.merge(resolvedItem, contentItem));
+            } else {
                 ContentMerger.merge((Container)resolvedContent, (Container) content);
                 contentWriter.createOrUpdate((Container)resolvedContent);
             }
